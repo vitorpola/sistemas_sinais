@@ -1,0 +1,74 @@
+body{
+    background-color: #f6f6f6;
+    padding: 0 5%;
+    font-family: Helvetica, sans-serif;
+}
+h2{
+    font-weight: 100;
+}
+
+.input{
+    float: left;
+    padding: 10px;
+    text-align: center;
+}
+button{
+    margin: 10px;
+    margin-top: 26px;
+    height: 40px;
+    background-color: orangered;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    right: 0;
+    position: absolute;
+}
+
+.input p{
+    margin: 0;
+    color: #666;
+    font-size: .6em;
+    letter-spacing: 0px;
+}
+
+input[type='number'], select{
+    width: 50px;
+    padding: 2px;
+    font-size: 1.6em;
+    height: 40px;
+    border-radius: 3px;
+    text-align: center;
+    border: none;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, .2);
+    margin-top: 5px;
+}
+
+input[type='checkbox'], input[type='radio']{
+    width: 50px;
+    margin-top: 5px;
+    height: 42px;
+    background: #fff;
+    border: 1px solid orangered;
+}
+
+select{
+    width: auto;
+    font-size: 1.2em;
+}
+
+
+canvas{
+    position: relative;
+    width: 70%;
+    max-height: 12%;
+    margin: 40px auto;
+}
+
+form{
+    width: 100%;
+    min-height: 80px;
+    background-color: #fcfcfc;
+    border: 1px dotted #ddd ;
+    border-radius: 6px;
+    position: relative;
+}
