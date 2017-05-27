@@ -1,229 +1,39 @@
 (function() {
 
-    //f(x) = 2*cos(10t) + 4sen(30t)
-    var t = basetempo(0, .25*Math.PI, .1);
+    var t_min = 0;
+    var t_max = 3.1*Math.PI;
+    var delta_t = .1;
+    var t = basetempo(0, 3.1*Math.PI, delta_t);
     
     var cos = cosseno(10,t);
     var x1 = escala(2, cos);
     var sen = seno(30, t);
     var x2 = escala(-4, sen);
 
-    var soma = soma_simples(x1,x2);    
+    var x_t = soma_simples(x1,x2);    
+    criarGrafico(t, x_t, 'x(t) = 2cos(10t) - 4 sin(30t)', true);
+
+    var y_t = eq_1_grau(1, 'rand', x_t);
+    criarGrafico(t, y_t, 'y(t) = 2cos(10t) - 4 sin(30t) + rand', true);
     
-    console.log(soma);
+    var fft_x = fft(x_t);
+    var fft_y = fft(y_t);
 
-//    criarGrafico(t, soma, 'x(t) = 2cos(10t) - 4 sin(30t)', true);
-
-    var rand = eq_1_grau(1, 'rand', soma);
-//    criarGrafico(t, rand, 'x(t) = 2cos(10t) - 4 sin(30t) + rand', true);
+    var f = escala_tempo(delta_t,t);
     
-    var fourrier = ft(soma);
-    var fourrier_fast = fft(soma);
-
-    console.log(fourrier);
-    console.log(fourrier_fast)
-
-    //var mod = modulo(fourrier.real, fourrier.imaginario);
-    //criarGrafico(t, mod, 'X(k) = FT( x(t) )', true);
+    var mod_x = modulo(fft_x.real, fft_x.imaginario);
+    criarGrafico(f, mod_x, 'X(k) = FT( x(t) )', true);
     
-    //var mod = modulo(fourrier_fast.par.real, fourrier_fast.impar.imaginario);    
-    //criarGrafico(t, mod, 'X(k) = FFT( x(t) )', true);
-
- //   console.log(fourrier)
-//    console.log(fourrier_fast);
-
-
-//    var f = escala_tempo(.05,t);
-
-//    criarGrafico(f, mod, 'abs(f)', true);
-
-    
-
-
-/*
-    // Exercício 2
-    var f1 = resultados(-4,-1,1,.75,3);
-    var f2 = resultados(0,6,1,-.5,3);
-    criarGrafico( f1.etapas.concat(f2.etapas), f1.resultados.concat(f2.resultados), 'exercicio 2');
-
-    //Exercicio 3 - A 
-    criarGrafico(exe1.etapas, mudarEscala(3, exe1.resultados), 'k*y(t)');
-
-    var soma = somarFuncao(exe1.resultados, f2.resultados);
-    criarGrafico(f1.etapas.concat(f2.etapas), f1.resultados.concat(soma), 'y1(t) + y2(t)');
-
-    var t = basetempo(0,2,.01);
-    criarGrafico(t, exponencial(.1,t), 'y(t) = e^(at)');
-    //criarGrafico(t, rambo(1,t), 'y(t) = cos(2pift)');
-
-    document.querySelector('button').onclick = function(){
-        submitForm();            
-    };
-    */
-
-    //init();
+    var mod_y = modulo(fft_y.real, fft_y.imaginario);    
+    mod_y[0] = mod_y[1];
+    criarGrafico(f, mod_y, 'Y(k) = FFT( y(t) )', true);
 
 })();
 
-var num_f = 1;
-var func_desc = document.querySelector('#func-desc');
-
-function init(){
-    func_desc = document.querySelector('#func-desc');
-    createInput('ti'+num_f, 't inicial', 'tempo');
-    createInput('tf'+num_f, 't final', 'tempo');
-    createInput('dt'+num_f, 'intervalo', 'tempo').addEventListener('blur', function(){
-                
-    });
-
-    createCheck('escala_tempo'+num_f, 'escala tempo', 'tempo');
-    createRadio('tipo_grafico'+num_f, 'discreto', 'tipo');
-    createRadio('tipo_grafico'+num_f, 'continuo', 'tipo');
-    createSelect(num_f);    
-}
-
-
-function calcularIntervalos(){
-    var t_inputs = document.querySelectorAll('input.tempo');
-    var ti = parseFloat(t_inputs[0].value);
-    var tf = parseFloat(t_inputs[1].value);
-    var dt = parseFloat(t_inputs[2].value);
-    var func = document.querySelector('select').value;
-    return basetempo(ti, tf, dt);
-}
-
-function submitForm(){
-    var t_inputs = document.querySelectorAll('input.tempo');
-    var ti = parseFloat(t_inputs[0].value);
-    var tf = parseFloat(t_inputs[1].value);
-    var dt = parseFloat(t_inputs[2].value);
-    var esc_tempo = document.querySelector('input')
-
-    var func = document.querySelector('select').value;
-    var t = basetempo(ti, tf, dt);
-
-    switch(func){
-        case 'exp':
-            var a = document.querySelector('input#a').value;
-            criarGrafico(t, exponencial(a,t), 'y(t) = e^(at)')
-        break;
-        case 'cos':
-            var f = document.querySelector('input#f').value;
-            criarGrafico(t, cos(f,t), 'y(t) = cos(2*pi*f*t)')
-        break;
-        case 'p_grau':
-            var a = parseFloat(document.querySelector('input#a').value);
-            var b = parseFloat(document.querySelector('input#b').value);
-            criarGrafico(t, eq_1_grau(a,b,t), 'y(t)= a*t+b')
-        }
-    basetempo(ti,tf,dt)
-}
-
-function loadFunction(func){
-    console.log(func);
-    switch(func){
-        case 'exp': 
-            createInput('a', 'Amplitude');
-        break;
-        case 'cos':
-            createInput('f', 'Frequência');
-        break;
-        case 'p_grau':
-            createInput('a', 'A', 'params');
-            createInput('b', 'B', 'params');
-        break;
-    }
-}
-
-function createInput(name, placeholder, classe){
-    var div = document.createElement('div');
-    div.className = 'input created';
-    var p = document.createElement('p');
-    p.textContent = placeholder;
-    var input = document.createElement('input');
-    input.type = 'number';
-    input.id = name;
-    input.className = classe;
-    div.appendChild(p);
-    div.appendChild(input);
-    document.forms[0].appendChild(div);
-    return input;
-}
-
-function createSelect(i){
-    var options = [
-        {value: '', label: 'Selecione'},
-        {value: 'p_grau', label: '1º Grau'},
-        {value: 'm_escala', label: 'Escala'},
-        {value: 'exp', label: 'Exponencial'},
-        {value: 'sen', label: 'Seno'},
-        {value: 'cos', label: 'Cosseno'},
-    ];
-
-    var div = document.createElement('div');
-    div.className = 'input created';
-    var p = document.createElement('p');
-    p.textContent = 'Função';
-    var input = document.createElement('select');
-    input.type = 'number';
-    input.id = 'select' + i;
-    input.className = 'function';
-    div.appendChild(p);
-    div.appendChild(input);
-
-    for (var i = 0; i < options.length; i++) {
-        var option = document.createElement("option");
-        option.value = options[i].value;
-        option.text = options[i].label;
-        input.appendChild(option);
-    }
-    document.forms[0].appendChild(div);
-
-    input.addEventListener('change', function(){
-        loadFunction(this.value);    
-                
-    });
-
-}
-
-function createCheck(name, placeholder, classe){
-    var div = document.createElement('div');
-    div.className = 'input created';
-    var p = document.createElement('p');
-    p.textContent = placeholder;
-    var input = document.createElement('input');
-    input.type = 'checkbox';
-    input.id = name;
-    input.className = classe;
-    div.appendChild(p);
-    div.appendChild(input);
-    document.forms[0].appendChild(div);
-    input.addEventListener('click', function(){
-        console.log('teste', this.checked);
-        if(this.checked){
-            createInput('esc_tempo', 'esc tempo');
-        }
-    });
-}
-
-
-function createRadio(name, placeholder, classe){
-    var div = document.createElement('div');
-    div.className = 'input created';
-    var p = document.createElement('p');
-    p.textContent = placeholder;
-    var input = document.createElement('input');
-    input.type = 'radio';
-    input.name = name;
-    input.className = classe;
-    div.appendChild(p);
-    div.appendChild(input);
-    document.forms[0].appendChild(div);
-}
 
 
 function ft_wn(N, k, n){    
-    return {real: Math.cos( (2*Math.PI*n*k)/N ), imag: Math.sin( (2*Math.PI*n*k)/N )};
+    return {real: Math.cos( (2*Math.PI*n*k)*1.0 /N ), imag: Math.sin( (2*Math.PI*n*k)*1.0/N )};
 }
 
 function ft(xn){
@@ -252,21 +62,14 @@ function fft(xn){
 
     for(var k = 0 ; k < N; k++){
         var xi_impar = 0, xr_impar = 0, xi_par = 0, xr_par = 0;
-        for(var n = 0; n < N/2 ; n++){
-            
-            var wn_par = ft_wn(N,k,n*2); 
-            
-            xi_par += xn[n*2] * wn_par.imag;
-            xr_par += xn[n*2] * wn_par.real;
-
-            var wn_impar = ft_wn(N,k,n*2+1); 
-            
-            xi_impar += xn[n*2+1] * wn_impar.imag;
-            xr_impar += xn[n*2+1] * wn_impar.real;
+        for(var n = 1; n <= N ; n+=2){
+            var wn_par = ft_wn(N,k,n-1); 
+            xi_par += xn[n-1] * wn_par.imag;
+            xr_par += xn[n-1] * wn_par.real;
+            var wn_impar = ft_wn(N,k,n); 
+            xi_impar += xn[n] * wn_impar.imag;
+            xr_impar += xn[n] * wn_impar.real;
         }
-        var wn2 = ft_wn(N,k,1);
-        xr_impar = (xr_impar*wn2.real + xi_impar*wn2.imag);
-        xi_impar = (xi_impar*wn2.real + xr_impar*wn2.imag);
         X.real.push(xr_par + xr_impar);
         X.imaginario.push(xi_par + xi_impar);    
     }
@@ -291,7 +94,7 @@ function fft(xn){
         var r = [];
         for(var i=0; i<t.length; i++){
             if(b !='rand') r.push(a*t[i]+b);
-            else r.push(a*t[i] + Math.random())
+            else r.push(a*t[i] + Math.random()*2)
         }
         return r;
     }
@@ -310,7 +113,7 @@ function fft(xn){
 function basetempo(ti, tf, dt){
     var t = [];
     for(var i=ti; i<= tf; i= i+dt){
-        t.push(parseFloat(i.toFixed(6)));
+        t.push(parseFloat(i).toFixed(1));
     }
     return t;
 }
@@ -330,7 +133,7 @@ function basetempo(ti, tf, dt){
 function escala_tempo(x, t){
     var r = [];
     for(var i=0; i<t.length; i++){
-       r.push(t[i]/x); 
+       r.push(t[i]*1.0/x); 
     }
     return r;
 }
@@ -484,9 +287,11 @@ function criarGrafico(etapas, resultados, titulo, continuo){
     body.appendChild(canvas);
 
     for(var i=0;i<etapas.length;i++){
-        etapas[i] = parseFloat(etapas[i]).toFixed(2);
+        etapas[i] = parseFloat(etapas[i]).toFixed(1);
         console.log('f('+etapas[i]+') = ', resultados[i]);
     }
+    Chart.defaults.global.defaultFontColor = '#000';
+    Chart.defaults.global.defaultFontSize = 11;
 
      var grafico = new Chart(canvas, {
                 type: 'line',
@@ -495,13 +300,11 @@ function criarGrafico(etapas, resultados, titulo, continuo){
                     datasets: [{
                         label: 'y(t)',
                         data: resultados,
-                        borderWidth: 1,
-                        backgroundColor: 'rgba(239, 108, 0, 0.2)',
-                        borderColor: 'rgba(239, 108, 0,1)',
+                        borderWidth: 2,
+                        borderColor: 'rgb(0, 0, 0)',
                         showLine: continuo,
                         pointRadius: (continuo? 0:4),
-                        tension: .4,
-                        
+                        tension: 0.3
                     }]
                 },
                 options: {
@@ -516,6 +319,9 @@ function criarGrafico(etapas, resultados, titulo, continuo){
                                 beginAtZero:true
                             }
                         }]
+                    },
+                    legend: {
+                        display: false
                     }
                 }
             });
