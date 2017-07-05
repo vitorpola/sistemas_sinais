@@ -22,14 +22,13 @@
     var f = escala_tempo(delta_t,t);
     
     var mod_x = modulo(fft_x.real, fft_x.imaginario);
-    criarGrafico(f, mod_x, 'X(k) = FT( x(t) )', true);
+    criarGrafico(f, mod_x, 'X(k) = FFT( x(t) )', true);
     
     var mod_y = modulo(fft_y.real, fft_y.imaginario);    
     mod_y[0] = mod_y[1];
     criarGrafico(f, mod_y, 'Y(k) = FFT( y(t) )', true);
 
 })();
-
 
 
 function ft_wn(N, k, n){    
